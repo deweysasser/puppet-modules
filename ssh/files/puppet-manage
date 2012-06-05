@@ -1,0 +1,50 @@
+#!/bin/bash
+
+# purpose:  manage the keys for puppet
+# todo:  rewrite this script to manage keys a bit nicer -- don't have blanks or duplicates
+
+auth="authorized_keys"
+
+usage() {
+    cat <<EOF
+usage:  $0 [-file AUTHORIZED_KEYS_FILE] [-require REQUIRED KEYS FILE] [-forbid FORBIDDEN KEYS FILE]
+EOF
+}
+
+while [ -n "$1" ] ; do
+    case "$1" in
+	-file) auth="$2"; shift;;
+	-user) user="$2"; shift;;
+	-require) required="$2"; shift;;
+	-forbid) forbidden="$2"; shift;;
+	-*) usage; exit 1;;
+    esac
+    shift
+done
+
+if [ -n "$required" -a -r "$required" ] ; then
+    cat "$required" | while read TYPE KEY COMMENT; do
+	if grep -q $KEY $auth; then
+	 echo > /dev/null
+	else
+	    echo "$TYPE $KEY $COMMENT" >> "$auth"
+	fi
+    done
+fi
+
+if [ -n "$forbidden" -a -r "$forbidden" ] ; then
+    if [ ! -f $auth.bak ] ; then
+	cp -p $auth $auth.bak
+    fi
+
+    cat "$forbidden" | while read TYPE KEY COMMENT; do
+	script="$script -e '/$KEY/d'"
+    done
+
+    if [ -n "$script" ] ; then
+	sed $script $auth > $auth.new
+	truncate --size 0 $auth
+	sort -u $auth.new >> $auth && rm $auth.new
+    fi
+fi
+
