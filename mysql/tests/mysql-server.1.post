@@ -5,4 +5,8 @@ set -x
 test -d /var/lib/mysql
 test -d /etc/mysql
 ps -ef | grep mysqld
+# try a connection with admin password
+
+test -d /var/lib/mysql/testdb
+# Try a connection to testdb with user and password
 
