@@ -1,0 +1,8 @@
+set -e
+set -x
+
+
+test -d /var/lib/mysql
+test -d /etc/mysql
+ps -ef | grep mysqld
+
