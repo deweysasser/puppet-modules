@@ -1,3 +1,7 @@
+STATUS: unmaintained
+
+This project has been archives -- I no longer use puppet.
+
 Dewey's collection of puppet modules
 
 My intention is that each class and type is exercised through at least
